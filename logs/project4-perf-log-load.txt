@@ -1,0 +1,25 @@
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 21:37:13  Samples:  3851
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 3.852     CPU time: 3.848
+/   _/                      v4.4.0
+
+Program: /Users/carlcheng/dev/cs130-spreadsheet/CS-130-Spreadsheet-Engine/tests/loadstresstest.py
+
+3.851 LoadWorkbookStressTest.test_load_2000  loadstresstest.py:48
+└─ 3.851 load_workbook  sheets/workbook.py:758
+   └─ 3.851 Workbook.set_cell_contents  sheets/workbook.py:366
+      └─ 3.822 Sheet.update_sheet_extent  sheets/sheet.py:20
+         ├─ 1.392 [self]  None
+         ├─ 0.986 <listcomp>  sheets/sheet.py:28
+         │  ├─ 0.534 [self]  None
+         │  └─ 0.452 str.join  None
+         ├─ 0.926 Sheet.column_index_from_string  sheets/sheet.py:67
+         │  ├─ 0.748 [self]  None
+         │  ├─ 0.065 len  None
+         │  ├─ 0.057 str.upper  None
+         │  └─ 0.056 ord  None
+         ├─ 0.331 max  None
+         ├─ 0.122 Cell.get_contents  sheets/cell.py:32
+         └─ 0.065 str.upper  None
+
+

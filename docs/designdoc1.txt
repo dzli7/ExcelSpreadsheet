@@ -1,0 +1,213 @@
+CS130 Project 1 - Design Document
+=================================
+
+Please answer all questions in this design document.  Note that the final
+feedback section is optional, and you are not required to answer it if you
+don't want to.
+
+Unanswered or incompletely answered questions, or answers that don't actually
+match the code/repository, will result in deductions.
+
+Answers don't have to be deeply detailed!  We are mainly looking for an
+overview or summary description of how your project works, and your team's
+experiences working on this project.
+
+Logistics (7 pts)
+-----------------
+
+L1.  [2pts] Enumerate all teammates here.
+
+     Daniel Li
+     Hernan Caceres
+     Carl Cheng
+
+L2.  [2pts] What did each teammate focus on during this project?
+
+     Daniel Li: lark parser, cell dependencies
+     Hernan Caceres: circular dependencies, topological sort
+     Carl Cheng: tests, major functions
+
+L3.  [3pts] Approximately how many hours did each teammate spend on the project?
+
+     Daniel Li: 26 hrs
+     Hernan Caceres: 22 hrs
+     Carl Cheng: 20 hrs
+
+
+Spreadsheet Engine Design (20 pts)
+----------------------------------
+
+D1.  [3pts] Describe the high-level design abstractions (e.g. classes and/or
+     submodules) in your spreadsheet engine, and what purposes these various
+     abstractions fulfill.
+
+     We have Workbook, Sheet, and Cell classes representing the structure of the actual spreadsheet 
+     engine. We created a formula parser class which helps to parse and calculate the value of any
+     formula input to the contents of a cell. In order to update the children of a cell once a value
+     is added or changed, we created a Graph class to help us to topologically sort the tree associated
+     with the root and update values in the correct order. 
+
+D2.  [4pts] Why did you choose the design you chose?  Describe other designs
+     (or perhaps earlier versions of the above design) that you considered,
+     and why you ended up not using them.
+
+     We chose the design of splitting into Workbook, Sheet, and Cell because as we began working, we
+     realized that each of these classes was necessary to perform all of the requested functions. We originally 
+     considered not having a Cell class and simply having all of the necessary information in stored in an
+     array or dictionary of Cells. However, as we worked and understood the spec, we realized that there
+     was simply too much information to not have a Cell class.
+
+D3.  [4pts] At a high level (e.g. pseudocode or higher), enumerate the steps
+     that your spreadsheet engine goes through when a caller sets a cell's
+     contents.
+
+     call to set_cell_contents with values (sheet_name, loc, contents)
+          check if loc is valid in the sheet sheet_name
+          get the previous cell associated with this location
+          make a new cell filled with the parsed contents
+          update children of new cell with children of old cell 
+          check if cell is formula:
+               if true: parse and calculate the values of the formula, set value of cell
+               if false: set value of cell to contents
+          update sheet with the new cell
+          update the children_cells of the parents of our new cell
+          check if any of the affected cells (children/parent) form a cycle
+               if they do: raise an error
+               if not: 
+                    sort all affected cells by number of parents
+          update affected cells in order sorted for in previous line
+
+
+D4.  [3pts] How does your spreadsheet engine identify what other cells need
+     updating when a cell's contents are changed, and what order to update them?
+
+     We store parent and children cells in order to identify what cells need to be updated.
+     When we set the contents of "cell", we update the cell.parent.children_cells values of each
+     parent for the "cell" to add the "cell". Then, if a cell is updated, we know what cells need 
+     to be updated because of the cell's children_cell's attribute. 
+
+     We know what order to update them because after we set update the children_cell, we create a 
+     directed graph starting at "cell" and going through the children_cells. We check that there is
+     no cycle, and then topological sort the affected cells. This gives us the order we can update
+     our cells now.
+
+
+D5.  [3pts] How does your spreadsheet engine identify cycles between cells when
+     a cell update is performed?  Are cells in a cycle processed any differently
+     from other cells outside of the cycle?
+
+     When checking for a cycle, our spreadsheet engine keeps a list of visited cells. When iterating 
+     through the children of the root, we continue to visit and mark cells in a queue. If we reach 
+     a cell that has already been marked, we announce we have detected a cycle. If no cell is reached 
+     by the end of the queue, no cycle has been detected.
+
+     Once we have detected a cycle, we iterate through all of the cells that we have visited to mark a 
+     cycle. For each of these cells, we set the value and contents to reflect the circular reference.
+
+D6.  [3pts] What steps does your spreadsheet engine go through when a sheet is
+     deleted from a workbook?  How does it identify cells that may need to be
+     recomputed after a sheet-deletion operation?
+
+     We first check that the sheet name indeed exists. We preemptively store the cells of this sheet 
+     to eventually find their parent cells and update/recompute such parent cells. If the sheet name
+     matches the form "Sheet#", then it is a default sheet name and we remove # from the list of 
+     default #s. We then use our "sheet name -> index in sheet list" dictionary to access the sheet,
+     and then we remove the sheet name from the dictionary. Then, for every sheet after the deleted
+     sheet, we decrement each sheet's index, as well as decrementing the sheet index inside the
+     "sheet name -> index in sheet list" dictionary. Finally, we remove the sheet from the sheet list,
+     decrement the total number of sheets, and identify cells that need to be recomputed.
+
+     We identify cells that need to be recomputed by iterating through the parents and children of 
+     each cell in the deleted sheet. We simply recompute each of these to update their respective
+     values, children, and parents.
+
+
+Implementation Process (23 pts)
+-------------------------------
+
+P1.  [4pts] How did your team break down and keep track of the various tasks to
+     complete for this project?  Did you use the GitHub issue tracker, or some
+     other system like Trello, or some other tool?
+
+     Our group used a whiteboard originally to breakdown what functionality was needed for various requirements from the spec. 
+     When the required functionality was determined, checklists on the Reminders application were created so that tasks could be
+     checked of as they were implemented, and to add tasks as we saw fit. 
+
+
+P2.  [4pts] How did you assign tasks to teammates?  Did you stick with your
+     task-assignments through the project, or did you shift around tasks as the
+     project progressed?  Why?
+
+     No group member had preference as to what parts of functionality each person wanted to implement. Thus, tasks were 
+     arbitrarily assigned to a teammate as we progressed with the project. For the most part, a teammember stuck with the tasks they were
+     assigned. Since we are students and not full time SWE developers (yet), there were times when a teammate may have had
+     to prioritize a homework assignment over their tasks. In this case, tasks were shifted such that someone who may have had
+     spare time and could pick up these tasks so we weren't stuck waiting on a teammate. We all tried to be flexible and work in this
+     way as a means of not delaying progress for the project.
+
+P3.  [4pts] How would you characterize the quality of your project testing?
+     Make sure to touch on these items:  Is it automated?  Is it easy for
+     teammates to run?  Is it fast?  Is it reasonably complete?
+
+     Our testing is automated using the unittest module. In our tests folder is where we keep 
+     all of our testing files. Within a testing file is a class that has various testing functions defined.
+     This allows all our tests to be automated by simply running the file, and all of teammates can run these files.
+     These tests are very fast as unittest provides a timer for tests and the timer never exceeds more than a second.
+     As we brainstormed potential edge cases, we would add tests to check the behavior when edge cases were identified
+     to ensure the tests are as complete as possible.
+
+
+P4.  [3pts] What mechanisms did your team use for communication during the
+     project?  Did you find them to be effective?  What issues did you
+     encounter, if any?
+
+     We used an iMessage group chat for team communicataion. This was for the most part effective. 
+     iMessage allows you to @someone similar to Slack to ensure messages directed at a specific teammate
+     would be of importance. Although there are better mechanisms for team communication, we did not encounter
+     any issues with our iMessage group chat.
+
+P5.  [3pts] Did you use any kind of collaborative construction techniques, e.g.
+     code reviews or pair-programming, during the project?  If so, what are your
+     observations about its usefulness?  Did you find it to have any downsides?
+
+     Throughout the project we implemented the technique of paired programming many times. We found this technique
+     to be very helpful. We did not want too many people editing the same files and such to avoid overwriting each other's code
+     and merge conflicts. There were many cases where an issue arised and one of the two people would be able to identify the
+     issue, helping us move through bugs much quicker. Although more lines of code could be written if everyone worked individually,
+     the quality of the work produced from paired programming is likely much better making implementing functionality and debgugging
+     easier. 
+
+
+P6.  [5pts] What would you like to improve about your team's development
+     process, going forward?
+
+     Going forward, our group is going to work on creating checkpoint deadlines. This was one thing we never touched upon in
+     our design / implementation meetings. When we had the tasks written down that needed to be evaluated, we never established dates
+     for when we wanted certain things done by. I believe that if we had assigned deadlines for specific tasks, this would have kept us
+     more consistent throughout the progress as a whole. Additionally, we did not finish debugging by the deadline (we used late token),
+     and had we finished functionality earlier, this would have allowed us more time for testing and debugging.
+
+
+Section F:  CS130 Project 1 Feedback [OPTIONAL]
+-----------------------------------------------
+
+These questions are OPTIONAL, and you do not need to answer them.  Your grade
+will not be affected by answering or not answering them.  Also, your grade will
+not be affected by negative feedback - we want to know what went poorly so that
+we can improve future versions of the course.
+
+F1.  What parts of the assignment did you find highly enjoyable?  Conversely,
+     what parts of the assignment did you find unenjoyable?
+
+
+F2.  What parts of the assignment helped you learn more about software
+     engineering best-practices, or other useful development skills?
+     What parts were not helpful in learning these skills?
+
+
+F3.  Were there any parts of the assignment that seemed _unnecessarily_ tedious?
+     (Some parts of software development are always tedious, of course.)
+
+
+F4.  Do you have any feedback and/or constructive criticism about how this
+     project can be made better in future iterations of CS130?

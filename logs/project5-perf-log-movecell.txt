@@ -1,0 +1,17 @@
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 01:40:54  Samples:  3215
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 3.215     CPU time: 3.212
+/   _/                      v4.4.0
+
+Program: /Users/carlcheng/dev/cs130-spreadsheet/CS-130-Spreadsheet-Engine/tests/movecellstresstest.py
+
+3.215 MoveCellStressTest.test_move_cell_2000  movecellstresstest.py:44
+└─ 3.214 Workbook.move_cells  sheets/workbook.py:835
+   └─ 3.210 Workbook.set_cell_contents  sheets/workbook.py:225
+      └─ 3.148 Sheet.update_sheet_extent  sheets/sheet.py:20
+         ├─ 1.691 [self]  None
+         ├─ 0.585 max  None
+         ├─ 0.462 Cell.get_extent  sheets/cell.py:28
+         └─ 0.410 Cell.get_contents  sheets/cell.py:41
+
+

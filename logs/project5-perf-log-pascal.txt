@@ -1,0 +1,74 @@
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 00:58:50  Samples:  910
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 0.914     CPU time: 0.913
+/   _/                      v4.4.0
+
+Program: /Users/carlcheng/dev/cs130-spreadsheet/CS-130-Spreadsheet-Engine/tests/pascalstresstest.py
+
+0.914 PascalStressTest.test_pascal_30  pascalstresstest.py:14
+└─ 0.914 Workbook.set_cell_contents  sheets/workbook.py:225
+   ├─ 0.880 Lark.parse  lark/lark.py:627
+   │  └─ 0.880 ParsingFrontend.parse  lark/parser_frontends.py:92
+   │     └─ 0.876 Parser.parse  lark/parsers/earley.py:249
+   │        ├─ 0.624 list._parse  lark/parsers/xearley.py:33
+   │        │  ├─ 0.544 Parser.predict_and_complete  lark/parsers/earley.py:65
+   │        │  │  ├─ 0.166 [self]  None
+   │        │  │  ├─ 0.116 Item.__init__  lark/parsers/earley_common.py:9
+   │        │  │  │  ├─ 0.088 [self]  None
+   │        │  │  │  ├─ 0.013 Rule.__hash__  lark/grammar.py:113
+   │        │  │  │  └─ 0.010 hash  None
+   │        │  │  ├─ 0.098 <listcomp>  lark/parsers/earley.py:122
+   │        │  │  │  ├─ 0.081 NonTerminal.__eq__  lark/grammar.py:18
+   │        │  │  │  │  ├─ 0.046 [self]  None
+   │        │  │  │  │  └─ 0.032 Token.__eq__  lark/lexer.py:253
+   │        │  │  │  │     └─ 0.024 [self]  None
+   │        │  │  │  └─ 0.017 [self]  None
+   │        │  │  ├─ 0.033 NonTerminal.__hash__  lark/grammar.py:25
+   │        │  │  │  ├─ 0.020 [self]  None
+   │        │  │  │  └─ 0.013 hash  None
+   │        │  │  ├─ 0.023 SymbolNode.add_family  lark/parsers/earley_forest.py:63
+   │        │  │  │  └─ 0.015 PackedNode.__init__  lark/parsers/earley_forest.py:125
+   │        │  │  │     └─ 0.013 [self]  None
+   │        │  │  ├─ 0.022 Item.__eq__  lark/parsers/earley_common.py:28
+   │        │  │  ├─ 0.021 Item.advance  lark/parsers/earley_common.py:25
+   │        │  │  │  └─ 0.014 Item.__init__  lark/parsers/earley_common.py:9
+   │        │  │  │     └─ 0.013 [self]  None
+   │        │  │  ├─ 0.020 SymbolNode.__init__  lark/parsers/earley_forest.py:49
+   │        │  │  │  └─ 0.017 [self]  None
+   │        │  │  ├─ 0.015 NonTerminal.__eq__  lark/grammar.py:18
+   │        │  │  │  └─ 0.012 [self]  None
+   │        │  │  └─ 0.013 Item.__hash__  lark/parsers/earley_common.py:31
+   │        │  └─ 0.077 scan  lark/parsers/xearley.py:35
+   │        │     ├─ 0.025 [self]  None
+   │        │     └─ 0.014 EarleyRegexpMatcher.match  lark/parser_frontends.py:172
+   │        └─ 0.238 ForestToParseTree.transform  lark/parsers/earley_forest.py:391
+   │           └─ 0.237 ForestToParseTree.visit  lark/parsers/earley_forest.py:529
+   │              └─ 0.235 ForestToParseTree.visit  lark/parsers/earley_forest.py:277
+   │                 ├─ 0.074 [self]  None
+   │                 ├─ 0.049 ForestToParseTree.visit_packed_node_out  lark/parsers/earley_forest.py:632
+   │                 │  └─ 0.043 ForestToParseTree.visit_packed_node_out  lark/parsers/earley_forest.py:444
+   │                 │     └─ 0.039 ForestToParseTree._visit_node_out_helper  lark/parsers/earley_forest.py:431
+   │                 │        ├─ 0.027 ForestToParseTree.transform_packed_node  lark/parsers/earley_forest.py:597
+   │                 │        │  └─ 0.013 [self]  None
+   │                 │        └─ 0.010 [self]  None
+   │                 ├─ 0.027 ForestToParseTree.visit_symbol_node_in  lark/parsers/earley_forest.py:619
+   │                 │  └─ 0.021 ForestToParseTree.visit_symbol_node_in  lark/parsers/earley_forest.py:416
+   │                 │     └─ 0.016 SymbolNode.children  lark/parsers/earley_forest.py:84
+   │                 │        └─ 0.012 [self]  None
+   │                 ├─ 0.023 ForestToParseTree.visit_packed_node_in  lark/parsers/earley_forest.py:625
+   │                 │  └─ 0.021 ForestToParseTree.visit_packed_node_in  lark/parsers/earley_forest.py:421
+   │                 │     └─ 0.017 PackedNode.children  lark/parsers/earley_forest.py:149
+   │                 │        └─ 0.013 [self]  None
+   │                 ├─ 0.021 ForestToParseTree.visit_symbol_node_out  lark/parsers/earley_forest.py:438
+   │                 │  └─ 0.020 ForestToParseTree._visit_node_out_helper  lark/parsers/earley_forest.py:431
+   │                 │     └─ 0.015 ForestToParseTree.transform_symbol_node  lark/parsers/earley_forest.py:575
+   │                 └─ 0.018 next  None
+   └─ 0.019 FormulaParser.visit  lark/visitors.py:415
+      └─ 0.018 FormulaParser._visit_tree  lark/visitors.py:421
+         └─ 0.015 FormulaParser.add_expr  sheets/formula_parser.py:75
+            └─ 0.013 FormulaParser.visit_children  lark/visitors.py:429
+               └─ 0.013 <listcomp>  lark/visitors.py:430
+                  └─ 0.013 FormulaParser._visit_tree  lark/visitors.py:421
+                     └─ 0.011 FormulaParser.cell  sheets/formula_parser.py:530
+
+

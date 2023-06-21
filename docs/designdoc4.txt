@@ -1,0 +1,197 @@
+CS130 Project 4 - Design Document
+=================================
+
+Please answer all questions in this design document.  Note that the final
+feedback section is optional, and you are not required to answer it if you
+don't want to.
+
+Unanswered or incompletely answered questions, or answers that don't actually
+match the code/repository, will result in deductions.
+
+Answers don't have to be deeply detailed!  We are mainly looking for an
+overview or summary description of how your project works, and your team's
+experiences working on this project.
+
+Logistics (7 pts)
+-----------------
+
+L1.  [2pts] Enumerate all teammates here.
+
+     Daniel Li
+     Hernan Caceres
+     Carl Cheng
+
+L2.  [2pts] What did each teammate focus on during this project?
+
+     Daniel Li: lark parser and grammar, debugging project 3, tests
+     Hernan Caceres: function implementation, tests
+     Carl Cheng: tests, stress tests
+
+L3.  [3pts] Approximately how many hours did each teammate spend on the project?
+
+     Daniel Li: 20
+     Hernan Caceres: 14
+     Carl Cheng: 8
+
+Spreadsheet Engine Design (31 pts)
+----------------------------------
+
+D1.  [3pts] Briefly describe the changes you made to the Lark parser grammar
+     to support Boolean literals.
+
+     We added a BOOL terminal denoting True/False.
+
+D2.  [4pts] Briefly describe the changes you made to the Lark parser grammar
+     to support conditional expressions.  How did you ensure that conditional
+     operations are lower precedence than arithmetic and string concatenation
+     operations?
+
+     We added a BOOL_OP terminal to the Lexer terminals to support conditional expressions.
+     BOOL_OP contains each of the necessary boolean literals. We also added a compare_expr 
+     expression which contains the BOOL_OP terminal to actually compute the conditional.
+     To ensure that the conditional operations are lower precedence than arithmetic and string 
+     concatenatation operations, we simply put the compare_expr line below the arithmetic and 
+     concatenatation lines to ensure the previous ones get calculated first.
+
+
+D3.  [6pts] Briefly describe how function invocation works in your spreadsheet
+     engine.  How easy or hard would it be for you to add new functions to your
+     engine?  What about a third-party developer?  How well does your code
+     follow the Open/Closed Principle?
+
+      We have a separate function file containing all of the functions that we currently support.
+      In order to add a new function, one would simply have to define it in this file (functions.py)
+      and add it to the dictionary defined at the bottom of the file.
+
+      Our code follows the Open/Close Principle well, since implementing new functions does
+      not require any changes to previous code other than the function dictionary. 
+
+
+D4.  [4pts] Is your implementation able to lazily evaluate the arguments to
+     functions like IF(), CHOOSE() and IFERROR()?  (Recall from the Project 4
+     spec that your spreadsheet engine should not report cycles in cases where
+     an argument to these functions does not need to be evaluated.)  If so,
+     what changes to your design were required to achieve this?  If not, what
+     prevented your team from implementing this?
+
+     Because we are still using a Transformer in our formula_parser, we do not
+     believe we are able to evaluate only arguments that need to be evaluated.
+
+
+D5.  [4pts] Is your implementation able to evaluate the ISERROR() function
+     correctly, with respect to circular-reference errors?  (Recall from the
+     Project 4 spec that ISERROR() behaves differently when part of a cycle,
+     vs. being outside the cycle and referencing some cell in the cycle.)
+     If so, what changes to your design were required to achieve this?  If
+     not, what prevented your team from implementing this?
+
+     Our implementation is able to evaluate the ISERROR() function correctly, 
+     with respect to circular-reference errors. We really didn't have to make that
+     many changes to our implementation because our formula_parser evaluates the 
+     parents of the input.
+
+
+D6.  [4pts] Is your implementation able to successfully identify cycles that
+     are not evident from static analysis of formulas containing INDIRECT()?
+     If so, what changes to your design were required, if any, to achieve this?
+     If not, what prevented your team from implementing this?
+
+     Our implementation is able to successfully identify cycles that are not 
+     evident from static analysis of formulas containing INDIRECT(). After we evaluate
+     the formula being input, we immediately go into cycle detection and update
+     all relevant cells. Thus, we did not need to make changes to our design.
+
+
+D7.  [6pts] Project 4 has a number of small but important operations to
+     implement.  Comparison operations include a number of comparison and type
+     conversion rules.  Different functions may require specific numbers and
+     types of arguments.  How did your team structure the implementation of
+     these operations?  How did your approach affect the reusability and
+     testability of these operations?
+
+     We have a general function_expr call in our formula parser that applies to 
+     all formulas except INDIRECT(). In this call, we evalute all of the inputted
+     arguments and input them into any arbitrary function with function(*args). This way
+     no matter how many arguments there are, we can apply the arguments to it.
+     This greatly helpds the reusability and testability because all of the functions
+     are essentially computed in one place, making it easy to add new functions
+     as well as test.
+
+
+Performance Analysis (12 pts)
+-----------------------------
+
+In this project you must measure and analyze the performance of features that
+generate large bulk changes to a workbook:  loading a workbook, copying or
+renaming a sheet, and moving or copying an area of cells.  Construct some
+performance tests to exercise these aspects of your engine, and use a profiler
+to identify where your program is spending the bulk of its time.
+
+A1.  [4pts] Briefly enumerate the performance tests you created to exercise
+     your implementation.
+
+     1. Load workbook stress test
+     2. Rename workbook stress test
+     3. Move cell stress test
+
+
+A2.  [2pts] What profiler did you choose to run your performance tests with?
+     Why?  Give an example of how to invoke one of your tests with the profiler.
+
+     We chose to use pyinstrument to run our performance tests due to its
+     ease of use. We can section out the specific function we want to test
+     by simply starting the profiler right before running the function and 
+     stopping it right after. For example, given a workbook of N nonzero cells,
+     we can simply start the profile before we move the N cells and stop it
+     right after. Then, we can simply run our tests to invoke the profiler.
+
+
+A3.  [6pts] What are ~3 of the most significant hot-spots you identified in your
+     performance testing?  Did you expect these hot-spots, or were they
+     surprising to you?
+
+     Although our rename, move cell, and load stress tests all performed
+     efficiently, the biggest hot-spots in all 3 tests is when we must
+     update_sheet_extent within the set_cell_contents call. When we run
+     load stress test, almost all of the time is spent in update_sheet_extent.
+     When we run rename stress test, for large N, the majority of the time 
+     is spent in update_sheet_extent, with the significant remainder of
+     the time spent in the rest of set_cell_contents (Lark.parse) and 
+     update_formula. When we run move cell stress test, all of the time is 
+     spent in update_sheet_extent, and in update_sheet_extent the time is
+     majority split by [self] (time taken by function excluding other 
+     functions called in that function) and the list comparison in 
+     update_sheet_extent. Thus, update_sheet_extent is a significant hot-spot,
+     and Lark.parse and update_formula are smaller but still significant 
+     hot-spots.
+
+     This behavior is somewhat expected since one of the things required
+     when loading a workbook, renaming a sheet, or moving cells is 
+     to update the extent of the sheets. For renaming a sheet, we would
+     additionally need to update the formulas that reference the sheet,
+     as well as parse said formulas.
+
+
+Section F:  CS130 Project 3 Feedback [OPTIONAL]
+-----------------------------------------------
+
+These questions are OPTIONAL, and you do not need to answer them.  Your grade
+will not be affected by answering or not answering them.  Also, your grade will
+not be affected by negative feedback - we want to know what went poorly so that
+we can improve future versions of the course.
+
+F1.  What parts of the assignment did you find highly enjoyable?  Conversely,
+     what parts of the assignment did you find unenjoyable?
+
+
+F2.  What parts of the assignment helped you learn more about software
+     engineering best-practices, or other useful development skills?
+     What parts were not helpful in learning these skills?
+
+
+F3.  Were there any parts of the assignment that seemed _unnecessarily_ tedious?
+     (Some parts of software development are always tedious, of course.)
+
+
+F4.  Do you have any feedback and/or constructive criticism about how this
+     project can be made better in future iterations of CS130?

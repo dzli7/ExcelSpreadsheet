@@ -1,0 +1,32 @@
+IMPROVEMENT 1:
+
+Theory: 
+Our recursive calls to set_cell_contents was too slow.
+
+Rationale: 
+This was especially evident when we ran our stress tests and they reached 
+max recursion depth. Also, running our profiler revealed that nearly all the 
+time of computation was being spent in set_cell_contents.
+
+Outcome:
+In order to fix this problem, we changed set_cell_contents to be iterative.
+Instead of recursively calling set_cell_contents on every cell that would be
+affected by the updating of its parents, we simply parse the formula and update
+it without calling set_cell_contents. This way, we can prevent the recursion
+depth being reached and greatly decrease the computation time. Now, we can
+successfully run our stress tests.
+
+
+IMPROVEMENT 2:
+
+Theory:
+Our formula parser was no interpreting literal errors (ex: #REF!) as the error
+value but as something else.
+
+Rationale:
+We failed a lot of acceptance tests regarding the computation of literal errors.
+
+Outcome: 
+We were able to fix this problem by adding a error check in our parser. This way,
+when it found a literal error reference, it would return the value of the
+corresponding CellErrorType. 

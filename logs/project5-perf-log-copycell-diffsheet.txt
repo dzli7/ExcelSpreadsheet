@@ -1,0 +1,20 @@
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 01:40:50  Samples:  991
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 0.992     CPU time: 0.989
+/   _/                      v4.4.0
+
+Program: /Users/carlcheng/dev/cs130-spreadsheet/CS-130-Spreadsheet-Engine/tests/copycellstresstest.py
+
+0.991 CopyCellStressTest.test_copy_cell_diff_sheet_2000  copycellstresstest.py:65
+└─ 0.991 Workbook.copy_cells  sheets/workbook.py:900
+   └─ 0.985 Workbook.set_cell_contents  sheets/workbook.py:225
+      ├─ 0.948 Sheet.update_sheet_extent  sheets/sheet.py:20
+      │  ├─ 0.469 [self]  None
+      │  ├─ 0.313 max  None
+      │  ├─ 0.088 Cell.get_contents  sheets/cell.py:41
+      │  └─ 0.078 Cell.get_extent  sheets/cell.py:28
+      ├─ 0.011 Workbook._check_loc  sheets/workbook.py:1234
+      │  └─ 0.010 Workbook._check_valid_location_str  sheets/workbook.py:1216
+      └─ 0.010 Cell.__init__  sheets/cell.py:8
+
+

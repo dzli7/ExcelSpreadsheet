@@ -1,0 +1,28 @@
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 01:01:00  Samples:  2053
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 2.053     CPU time: 2.049
+/   _/                      v4.4.0
+
+Program: /Users/carlcheng/dev/cs130-spreadsheet/CS-130-Spreadsheet-Engine/tests/renamenorefstresstest.py
+
+2.053 RenameNoRefStressTest.test_rename_noref_1000  renamenorefstresstest.py:56
+└─ 2.052 Workbook.rename_sheet  sheets/workbook.py:700
+   ├─ 2.014 Workbook.set_cell_contents  sheets/workbook.py:225
+   │  └─ 1.970 Sheet.update_sheet_extent  sheets/sheet.py:20
+   │     ├─ 0.961 [self]  None
+   │     ├─ 0.682 max  None
+   │     ├─ 0.178 Cell.get_extent  sheets/cell.py:28
+   │     └─ 0.148 Cell.get_contents  sheets/cell.py:41
+   └─ 0.038 deepcopy  copy.py:128
+      └─ 0.038 _reconstruct  copy.py:259
+         └─ 0.038 deepcopy  copy.py:128
+            └─ 0.038 _deepcopy_dict  copy.py:227
+               └─ 0.038 deepcopy  copy.py:128
+                  └─ 0.038 _deepcopy_dict  copy.py:227
+                     └─ 0.038 deepcopy  copy.py:128
+                        └─ 0.036 _reconstruct  copy.py:259
+                           └─ 0.031 deepcopy  copy.py:128
+                              └─ 0.029 _deepcopy_dict  copy.py:227
+                                 └─ 0.023 deepcopy  copy.py:128
+
+

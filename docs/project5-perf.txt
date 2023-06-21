@@ -1,0 +1,43 @@
+IMPROVEMENT 1:
+
+Theory: 
+Update_sheet_extent is the slowest function that bottlenecks many processes,
+including move_cell and rename_sheet. Update_sheet_extent took up the majority 
+of the time because we computed the location of cells every time a cell was 
+added to sheet (using column_index_from_string). We changed cell to instead 
+compute its column index when we initialize the cell and store it in a field
+so that it only has to do so once.
+
+Rationale: 
+We used pyinstrument to profile the line of code when we rename a sheet 
+with existing references to determine which part of rename_sheet was the 
+culprit. We also profiled move_cell in the same fashion. In both cases, the 
+bottleneck was update_sheet_extent since update_sheet_extent always took up
+the majority of the time.
+
+Outcome:
+After making these changes, test_rename_2000 went from running in ~19s to 
+~9.5s, doubling the speed. test_move_cell_2000 went from running in ~14s to
+~3s, so our changes clearly improved the speed of these functions.
+
+IMPROVEMENT 2:
+
+Theory:
+We had an unnecessary list comprehension that computed the info of every cell 
+in visited_children in our circular dependency checker. This caused updating 
+cells with multiple children to be very slow, since we were continually
+using the list comprehension to generate a new list for each cell. This mostly
+affected pascal stress test.
+
+Rationale:
+We used pyinstrument to profile the line of code where we updated the parent cell 
+(hence updating all children cells) in pascal test to determine which part
+of the code was slowing pascal test down. We found that the bottleneck was due
+to a list comprehension, and since pyinstrument tells us exactly what line the 
+list comprehension occurred, we were able to restructure our code such that the
+list comprehension was unnecessary.
+
+Outcome: 
+test_pascal_30 went from running in >60s to ~1s, indicating a major improvement
+in performance. When profiling the new code, the list comprehension is no
+longer there.

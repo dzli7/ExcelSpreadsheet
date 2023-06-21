@@ -1,0 +1,215 @@
+CS130 Project 3 - Design Document
+=================================
+
+Please answer all questions in this design document.  Note that the final
+feedback section is optional, and you are not required to answer it if you
+don't want to.
+
+Unanswered or incompletely answered questions, or answers that don't actually
+match the code/repository, will result in deductions.
+
+Answers don't have to be deeply detailed!  We are mainly looking for an
+overview or summary description of how your project works, and your team's
+experiences working on this project.
+
+Logistics (7 pts)
+-----------------
+
+L1.  [2pts] Enumerate all teammates here.
+
+     Daniel Li
+     Hernan Caceres
+     Carl Cheng
+
+L2.  [2pts] What did each teammate focus on during this project?
+
+     Daniel: major performance fixes, literal errors
+     Hernan: copy cells, move cells, performance fixes
+     Carl: performance fixes, linter
+
+L3.  [3pts] Approximately how many hours did each teammate spend on the project?
+
+     Daniel: 14 hours
+     Hernan: 14 hours
+     Carl: 11 hours
+
+Spreadsheet Engine Design (9 pts)
+----------------------------------
+
+D1.  [3pts] Moving and copying regions of a sheet are very similar operations,
+     with only a few differences between them.  How did your team take advantage
+     of the similarity of these two operations to reduce the amount of code
+     required to provide this functionality?
+
+     When it comes to the move and copy operations, they are fundamentally the
+     same, with the one key difference that cells being copied that are not also
+     in the target area are cleared. Thus, the process of finding the cells to be
+     copied and the cells that make up the target area are in a helper function
+     called by move and copy. Additionally, formula and child updating for cells
+     with references are cpomputed in this helper function. Thus, the helper returns
+     the cells to be copied, the target area cells, and the contents of the target
+     area cells. So copy() can simply set the contents of the target area cells. 
+     move() can similarly clear the cells that were copied, and set the contents
+     of the target area cells. 
+
+
+D2.  [3pts] Similarly, moving/copying regions of a sheet, and renaming a sheet,
+     both involve formula updates.  Was your team able to factor out common
+     aspects of these two operations to reduce the amount of code required to
+     implement these operations?  If so, what did you do?  If not, why not?
+
+     Yes, we have one lark Transformer that deals with both the moving/copying 
+     and renaming of sheets. We have an indicator that denotes whether a formula
+     has to be shifted or if the formula simply has to be updated with a new 
+     sheet name. If this indicator, denoted "shift" for the amount a cell has to 
+     be shifted, if not None, then we go to a helper function which computes and 
+     updates the location of the shifted cell. If it is None, then we go to another
+     helper which updates the formula with a new sheet name.
+
+
+D3.  [3pts] How does your implementation address the challenges of moving or
+     copying a region of cells where the source and target regions overlap?
+     Before the cells are "moved" or "copied", the new contents of the 
+     target area cells are previously computed in a helper function. Since 
+     cells being copied in copy() do not need to be cleared, we can simply
+     just set the cells of the target area with the new contents. The same 
+     holds for move(): since the target area cells' contents are precomputed,
+     we can clear all the cells that were copied. We then just go back and
+     iterate through target cells and set their new contents. 
+
+
+Static Code Analysis / Code Linting (16pts)
+-------------------------------------------
+
+L1.  [5pts] The Project 3 spec includes an example of a subtle implementation
+     bug with the Python counts(s, totals) function as written in the spec.
+     Briefly describe the cause of the buggy behavior, and what is the
+     recommended approach for avoiding the buggy behavior.
+
+     We note that the default argument for the 'totals' parameter is an empty 
+     dictionary. Thus, the instance of this empty dictionary is reused
+     for every subsequent call to counts() that doesn't pass in an argument
+     for 'totals'. We see this in counts('abcd'), where the first call of
+     t = counts('hello') also does not provide anything for totals parameter.
+     Thus, in counts('abcd'), the dictionary from the 'totals' carries over
+     from the previous two calls to counts(). To avoid this, we want to
+     use an immutable default argument for 'totals'. In example, if 
+     counts was defined as counts(s: str, totals: Dict[str, int] = None),
+     there is no instance of an object that can be carried over between 
+     function calls. Then, you can set totals={} if the default argument
+     of none has been passed in (no parameter for totals is passed in.)
+
+
+L2.  [4pts] What code-linter did your team use on your project?  Why did you
+     choose it?  Was this the first CS130 project in which you used a linter?
+
+     Our team chose to use pylint on this project. We chose to use pylint due
+     to its ease of configuration; we could easily configure pylint's warnings
+     by generating and then editing the corresponding .pylintrc configuration 
+     file.
+
+L3.  [3pts] How did you automate the execution of your code linter?  Did
+     everyone in your team find it easy to run?
+
+     We automated execution of our code linter by writing a Makefile that
+     runs pylint on the entire sheets folder with the command alias 'lint'.
+     Thus, by running 'make lint', we can easily use the linter on the entire
+     project. Our Makefile also supports per-file linting, simply by running
+     'make [file].pylint'. Thus, if I only wanted to run the linter on
+     sheet.py, I could easily do so by running 'make sheets/sheet.pylint'.
+     This makes our linter easy to use.
+
+
+L4.  [4pts] Did the use of the linter improve your overall code quality and
+     correctness?  Give some specific details in your answer.  Were there any
+     serious issues (e.g. buggy language idioms) you were unaware of?
+
+     Yes, use of the linter improved our overall code quality significantly.
+     We initially scored a 7.2/10 on code quality, mostly due to insignificant
+     warnings such as lines being too long, standard imports being in wrong
+     order, etc. But after configuring the linter to our specifications,
+     we were able to identify the more serious errors such as our overuse
+     of try, except clauses and duplicate code. Our extra try, except clauses
+     in set_cell_contents were our most serious language abuses we identified.
+
+
+Performance Improvement (18 pts)
+--------------------------------
+
+In this project you must improve the performance of two central areas of your
+spreadsheet engine - cell updating and cycle detection.  In the previous project
+your team should have written some performance-testing code in preparation for
+this effort, and should have run it under a profiler to get an initial sense of
+where improvements can be made.  In this project you will follow through on
+this investigation, and fix performance issues in your code.
+
+P1.  [7pts] Give a brief overview of 3-4 of the worst hot-spots you identified
+     in your performance testing and analysis.  For each one, describe how your
+     team was able to resolve it.
+
+     1. We found that we recursively called set_cell_contents which used a lot of 
+        time in our computation and had potential to reach max recursion depth. 
+        Changing this to be iterative fixing the TLE and helped us in our performance 
+        tests from project 2.
+
+     2. We also recursively called build_dependency_graph. Again, changing it to
+        be iterative helped to speed up computation and prevent us from reaching max
+        recursion depth.
+
+     3. We had problems with our rename tests encountering a TLE prior to 
+        this week. We fixed this by reordering groups of code in our rename function
+        so that we had to do less repetitive computation and thus we were able to
+        fix our errors.
+
+P2.  [4pts] Did your team try anything to resolve performance issues and find
+     that it didn't improve things at all - perhaps even made things worse?
+     If so, were you able to identify why the intended fix didn't produce the
+     desired benefit?
+
+      There wasn't anything where we tried to improve it and we didn't see
+      any improvement. 
+
+
+P3.  [4pts] How do you feel that your performance updates affected your code's
+     readability and maintainability?  Did it make it better? worse? unchanged?
+     Elaborate on your answer.
+
+      I feel like our performance updates makes our code a little less readible.
+      Simply because we had to change a couple functions to be iterative, we 
+      had to add quite a few lines of repetitive code to make up for it, which
+      we think affects our codes readability.
+
+
+P4.  [3pts] Did your performance updates cause any regressions in functionality?
+     If so, briefly describe any issues that emerged.  How were these issues
+     identified (e.g. automated test failures, manual testing, etc.)?  How
+     quickly were issues identified?
+
+      Our performance updates did not cause any regressions in functionality. Any
+      errors that we found after implementing our performance updates were due to 
+      minor mistakes in our code.
+
+
+Section F:  CS130 Project 3 Feedback [OPTIONAL]
+-----------------------------------------------
+
+These questions are OPTIONAL, and you do not need to answer them.  Your grade
+will not be affected by answering or not answering them.  Also, your grade will
+not be affected by negative feedback - we want to know what went poorly so that
+we can improve future versions of the course.
+
+F1.  What parts of the assignment did you find highly enjoyable?  Conversely,
+     what parts of the assignment did you find unenjoyable?
+
+
+F2.  What parts of the assignment helped you learn more about software
+     engineering best-practices, or other useful development skills?
+     What parts were not helpful in learning these skills?
+
+
+F3.  Were there any parts of the assignment that seemed _unnecessarily_ tedious?
+     (Some parts of software development are always tedious, of course.)
+
+
+F4.  Do you have any feedback and/or constructive criticism about how this
+     project can be made better in future iterations of CS130?

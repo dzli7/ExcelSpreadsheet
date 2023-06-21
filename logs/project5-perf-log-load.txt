@@ -1,0 +1,17 @@
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 17:26:19  Samples:  1013
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 1.013     CPU time: 1.011
+/   _/                      v4.4.0
+
+Program: /Users/carlcheng/dev/cs130-spreadsheet/CS-130-Spreadsheet-Engine/stresstests/loadstresstest.py
+
+1.013 LoadWorkbookStressTest.test_load_2000  loadstresstest.py:48
+└─ 1.012 load_workbook  sheets/workbook.py:546
+   └─ 1.012 Workbook.set_cell_contents  sheets/workbook.py:225
+      └─ 0.982 Sheet.update_sheet_extent  sheets/sheet.py:20
+         ├─ 0.479 [self]  None
+         ├─ 0.325 max  None
+         ├─ 0.093 Cell.get_contents  sheets/cell.py:41
+         └─ 0.084 Cell.get_extent  sheets/cell.py:28
+
+

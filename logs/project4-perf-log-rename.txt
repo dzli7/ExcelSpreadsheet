@@ -1,0 +1,60 @@
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 21:37:23  Samples:  3687
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 3.697     CPU time: 3.693
+/   _/                      v4.4.0
+
+Program: /Users/carlcheng/dev/cs130-spreadsheet/CS-130-Spreadsheet-Engine/tests/renamestresstest.py
+
+3.696 RenameStressTest.test_rename_1000  renamestresstest.py:52
+└─ 3.696 Workbook.rename_sheet  sheets/workbook.py:912
+   ├─ 2.749 Workbook.set_cell_contents  sheets/workbook.py:366
+   │  ├─ 1.953 Sheet.update_sheet_extent  sheets/sheet.py:20
+   │  │  ├─ 0.715 [self]  None
+   │  │  ├─ 0.507 <listcomp>  sheets/sheet.py:28
+   │  │  │  ├─ 0.285 [self]  None
+   │  │  │  └─ 0.222 str.join  None
+   │  │  ├─ 0.473 Sheet.column_index_from_string  sheets/sheet.py:67
+   │  │  │  ├─ 0.377 [self]  None
+   │  │  │  └─ 0.043 len  None
+   │  │  ├─ 0.163 max  None
+   │  │  └─ 0.066 Cell.get_contents  sheets/cell.py:32
+   │  └─ 0.754 Lark.parse  lark/lark.py:627
+   │     └─ 0.754 ParsingFrontend.parse  lark/parser_frontends.py:92
+   │        └─ 0.750 Parser.parse  lark/parsers/earley.py:249
+   │           ├─ 0.524 list._parse  lark/parsers/xearley.py:33
+   │           │  ├─ 0.457 Parser.predict_and_complete  lark/parsers/earley.py:65
+   │           │  │  ├─ 0.138 [self]  None
+   │           │  │  ├─ 0.107 Item.__init__  lark/parsers/earley_common.py:9
+   │           │  │  │  └─ 0.089 [self]  None
+   │           │  │  └─ 0.079 <listcomp>  lark/parsers/earley.py:122
+   │           │  │     └─ 0.059 NonTerminal.__eq__  lark/grammar.py:18
+   │           │  └─ 0.060 scan  lark/parsers/xearley.py:35
+   │           └─ 0.214 ForestToParseTree.transform  lark/parsers/earley_forest.py:391
+   │              └─ 0.214 ForestToParseTree.visit  lark/parsers/earley_forest.py:529
+   │                 └─ 0.211 ForestToParseTree.visit  lark/parsers/earley_forest.py:277
+   │                    ├─ 0.071 [self]  None
+   │                    └─ 0.041 ForestToParseTree.visit_packed_node_out  lark/parsers/earley_forest.py:632
+   └─ 0.922 Workbook.update_formula  sheets/workbook.py:1017
+      └─ 0.918 Lark.parse  lark/lark.py:627
+         └─ 0.917 ParsingFrontend.parse  lark/parser_frontends.py:92
+            └─ 0.912 Parser.parse  lark/parsers/earley.py:249
+               ├─ 0.686 list._parse  lark/parsers/xearley.py:33
+               │  ├─ 0.607 Parser.predict_and_complete  lark/parsers/earley.py:65
+               │  │  ├─ 0.169 [self]  None
+               │  │  ├─ 0.147 <listcomp>  lark/parsers/earley.py:122
+               │  │  │  └─ 0.116 NonTerminal.__eq__  lark/grammar.py:18
+               │  │  │     ├─ 0.058 Token.__eq__  lark/lexer.py:253
+               │  │  │     │  └─ 0.050 [self]  None
+               │  │  │     └─ 0.051 [self]  None
+               │  │  └─ 0.115 Item.__init__  lark/parsers/earley_common.py:9
+               │  │     └─ 0.088 [self]  None
+               │  └─ 0.073 scan  lark/parsers/xearley.py:35
+               └─ 0.213 ForestToParseTree.transform  lark/parsers/earley_forest.py:391
+                  └─ 0.213 ForestToParseTree.visit  lark/parsers/earley_forest.py:529
+                     └─ 0.211 ForestToParseTree.visit  lark/parsers/earley_forest.py:277
+                        ├─ 0.056 [self]  None
+                        └─ 0.050 ForestToParseTree.visit_packed_node_out  lark/parsers/earley_forest.py:632
+                           └─ 0.043 ForestToParseTree.visit_packed_node_out  lark/parsers/earley_forest.py:444
+                              └─ 0.043 ForestToParseTree._visit_node_out_helper  lark/parsers/earley_forest.py:431
+
+

@@ -1,0 +1,150 @@
+CS130 Project 5 - Design Document
+=================================
+
+Please answer all questions in this design document.  Note that the final
+feedback section is optional, and you are not required to answer it if you
+don't want to.
+
+Unanswered or incompletely answered questions, or answers that don't actually
+match the code/repository, will result in deductions.
+
+Answers don't have to be deeply detailed!  We are mainly looking for an
+overview or summary description of how your project works, and your team's
+experiences working on this project.
+
+Logistics (7 points)
+--------------------
+
+L1.  [2pts] Enumerate all teammates here.
+
+     Daniel Li
+     Hernan Caceres
+     Carl Cheng
+
+L2.  [2pts] What did each teammate focus on during this project?
+
+     Daniel Li: implementing Interpreter, cell-range, new functions associated with cell-range
+     Hernan Caceres: sorting, tests, project 4 fixes
+     Carl Cheng: profiler, tests, debugging
+
+L3.  [3pts] Approximately how many hours did each teammate spend on the project?
+
+     Daniel Li: 16
+     Hernan Caceres: 12 
+     Carl Cheng: 7
+
+
+Spreadsheet Engine Design (10 points)
+-------------------------------------
+
+D1.  [4pts] Give an overview of how you implemented sorting.  Do you sort the
+     rows directly?  Do you use adapter objects instead?  Some other technique?
+
+     For sorting, we followed the reccomendation of using row adapter objects. 
+     Row adapter objects are initiated such that each object is aware of where the row
+     being represented is in the spreadsheet, and the columns to be sorted on. Therefore,
+     to our row objects we pass in the row index, the row values, and sort_cols. These
+     row objects were then sorted by assigning rich comparison dunder methods to the adapter object,
+     and the sorted row ordering was used to sort the actual rows in the sheet.
+
+
+D2.  [3pts] How does your implementation solve the problem of supporting the
+     user-specified row ordering based on both the columns and the ordering to
+     sort by?  Did you create any classes or functions to help specifically with
+     this task?
+
+     In order to handle user-specified row ordering based on the sort_cols argument,
+     we implemenented rich comparison dunder methods. Using total_ordering provided
+     by the functools module, we only had to implemenet __lt__ and __eq__. Thus, we
+     would iterate throgh a column index for two rows and would check the result of 
+     "less than" for the two row values less than. If the objects were equal, 
+     it continues to the next column to be sorted on in sort cols. 
+     The __eq__ checks for equality throughout the entire row on all possible columns 
+     to sort on. 
+
+D3.  [3pts] Briefly describe the changes you made to your spreadsheet engine to
+     satisfy the stricter cell-change notification behaviors.  Did you find this
+     to be largely straightforward to change?  Why or why not?
+
+     Yes, the stricter cell-change notifications was straightforward to change. 
+     Our previous implementation already only updates at the end of the entire call
+     and we simply just had to make sure that there were no duplicate cells in the 
+     list of cells that had to be notified. We also added a default flag denoting
+     if the notify cells function should be called immediately, which would be 
+     at the end of set_cell_contents or if it should skip and be called later.
+
+
+Performance Improvement (13 pts)
+--------------------------------
+
+In this project you must improve the performance of operations that involve
+bulk updating of cell formulas and/or values.  In the previous project your
+team should have written some performance-testing code in preparation for this
+effort, and should have run it under a profiler to get an initial sense of
+where improvements can be made.  In this project you need to follow through on
+this setup, and address performance issues in your code.
+
+P1.  [7pts] Give a brief overview of 2-3 of the worst hot-spots you identified
+     in your performance testing and analysis.  For each one, describe how your
+     team was able to resolve it.
+
+     The worst hot-spot we identified in our performance testing was the list 
+     comprehension in our circular dependency checker in set_cell_contents. 
+     The hot-spot was most apparent when we updated parent cells with many 
+     children, causing the children to need to be updated.
+     We were able to resolve it by profiling our pascal stress test,
+     identifying the specific line of code that the list comprehension was 
+     on, and restructuring our code such that we didn't need to recompute 
+     the list every time.
+
+     Another bad hot-spot we identified was update_sheet_extent unnecessarily 
+     computing the column_index_from_string of cells in the sheet every time 
+     a cell was added. This caused us to have unnecessary computations of 
+     column_index_from_string, so we changed it so that the only time we 
+     compute column_index_from_string is when a cell is initialized, and we 
+     store that value in the cell so no recomputation is necessary. We also 
+     identified this bug using our profiler when we profiled move cell and 
+     rename stress test.
+
+
+P2.  [3pts] Did your team try anything to address performance issues and find
+     that it didn't improve things at all?  If so, were you able to identify why
+     the intended fix didn't produce the desired benefit?
+
+     No, most of the time the profiler gave us enough information to locate the
+     specific line or lines of code that caused the slow-down. As such, our 
+     fixes were able to be found quickly.
+
+P3.  [3pts] Did your performance updates cause any regressions in functionality?
+     If so, briefly describe any issues that emerged.  How were these issues
+     identified (e.g. automated test failures, manual testing, etc.)?  How
+     quickly were issues identified?
+
+     The performance updates did not cause any regressions in functionality.
+     Fixing the errors from the performance updates only helped to speed up or
+     even fix some previous errors we had.
+
+
+Section F:  CS130 Project 4 Feedback [OPTIONAL]
+-----------------------------------------------
+
+These questions are OPTIONAL, and you do not need to answer them.  Your grade
+will not be affected by answering or not answering them.  Also, your grade will
+not be affected by negative feedback - we want to know what went poorly so that
+we can improve future versions of the course.
+
+F1.  What parts of the assignment did you find highly enjoyable?  Conversely,
+     what parts of the assignment did you find unenjoyable?
+
+
+F2.  What parts of the assignment helped you learn more about software
+     engineering best-practices, or other useful development skills?
+     What parts were not helpful in learning these skills?
+
+
+F3.  Were there any parts of the assignment that seemed _unnecessarily_ tedious?
+     (Some parts of software development are always tedious, of course.)
+
+
+F4.  Do you have any feedback and/or constructive criticism about how this
+     project can be made better in future iterations of CS130?
